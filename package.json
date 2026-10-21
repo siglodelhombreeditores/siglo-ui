@@ -1,0 +1,27 @@
+{
+  "name": "@siglo/ui",
+  "description": "Funcionalidades PrestaShop themes Siglo",
+  "author": "Siglo",
+  "license": "ISC",
+  "version": "0.1.0",
+  "type": "module",
+  "sideEffects": ["*.scss", "*.css"],
+  "style": "scss/_index.scss",
+  "sass": "scss/_index.scss",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles": {
+      "sass": "./styles/_index.scss",
+      "default": "./styles/_index.scss"
+    },
+    "./styles/*": "./styles/*.scss",
+    "./package.json": "./package.json"
+  },
+  "files": ["src", "styles"],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "bootstrap": ">=5.0.0"
+  }
+}
