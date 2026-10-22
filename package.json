@@ -3,17 +3,19 @@
   "description": "Funcionalidades PrestaShop themes Siglo",
   "author": "Siglo",
   "license": "ISC",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "sideEffects": ["*.scss", "*.css"],
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
   "style": "scss/_index.scss",
   "sass": "scss/_index.scss",
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+    "./components": {
+      "types": "./src/components/index.ts",
+      "default": "./src/components/index.ts"
+    },
+    "./services": {
+      "types": "./src/services/index.ts",
+      "default": "./src/services/index.ts"
     },
     "./styles": {
       "sass": "./styles/_index.scss",
@@ -22,11 +24,18 @@
     "./styles/*": "./styles/*.scss",
     "./package.json": "./package.json"
   },
-  "files": ["src", "styles"],
+  "files": ["src", "styles", "components", "services"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {
+    "@types/bootstrap": ">=5.0.0",
     "bootstrap": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/bootstrap": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/bootstrap": "^5.2.11"
   }
 }
