@@ -1,6 +1,6 @@
-import ProxyElemento from "../elemento/proxy-elemento";
+import { ProxyElemento } from "../elemento/proxy-elemento";
 
-export default class Spinner extends ProxyElemento {
+export class Spinner extends ProxyElemento {
   show() {
     this.classList.remove('d-none');
   }

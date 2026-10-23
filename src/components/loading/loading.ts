@@ -1,8 +1,8 @@
-import Backdrop from "./backdrop";
-import Spinner from "./spinner";
-import BaseElemento from "../elemento/base-elemento";
+import { Backdrop } from "./backdrop";
+import { Spinner } from "./spinner";
+import { BaseElemento } from "../elemento/base-elemento";
 
-export default class Loading {
+export class Loading {
 
   static instance(
     backdropSelector: string = '.loading-content', spinnerSelector: string = '.spinner', parent?: HTMLElement|BaseElemento

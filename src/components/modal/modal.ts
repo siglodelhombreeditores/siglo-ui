@@ -1,8 +1,8 @@
 import BootstrapModal from 'bootstrap/js/dist/modal';
-import Elemento, { ElementoListenable } from "../elemento/elemento";
+import { Elemento, ElementoListenable } from "../elemento/elemento";
 import { type BootstrapBackdropType } from "../loading/backdrop";
 import { LoadingMain } from "../loading/loading-main";
-import Loading from "../loading/loading";
+import { Loading } from "../loading/loading";
 
 export type SigloBootstrapModal = BootstrapModal & {
   _scrollBar: { reset: () => void },

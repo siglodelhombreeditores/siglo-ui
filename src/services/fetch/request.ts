@@ -10,8 +10,6 @@ export class Request {
   private timeout: number = 0;
   private timeoutId: number|undefined = undefined;
 
-  private responseType: 'json'|'text'|null = 'json';
-
   constructor() {
     this.headersDefault = Object.assign({}, this.headers);
   }
@@ -36,13 +34,15 @@ export class Request {
     return this;
   }
 
-  setResponseText(): this {
-    return this.setResponseType('text');
-  }
-
   get<T = any>(url: string): Promise<T> {
     return new Promise((resolve, reject) =>
       this.setMethod('GET').handleFetch(this.fetch(url), resolve, reject)
+    )
+  }
+
+  getText(url: string): Promise<string> {
+    return new Promise((resolve, reject) =>
+      this.setMethod('GET').handleFetch(this.fetch(url), resolve, reject, 'text')
     )
   }
 
@@ -63,13 +63,14 @@ export class Request {
   private async handleFetch<T>(
     fetchPromise: Promise<Response>,
     resolve: (resp: T) => void,
-    reject: (resp: any) => void
+    reject: (resp: any) => void,
+    responseType: 'json' | 'text' | null = 'json',
   ) {
     try {
       const resp = await fetchPromise;
 
-      let isJson: boolean = this.responseType === 'json';
-      if (!this.responseType) {
+      let isJson: boolean = responseType === 'json';
+      if (!responseType) {
         const contentType = resp.headers.get('content-type');
         isJson = contentType ? contentType.includes('application/json') : false;
       }
@@ -119,10 +120,5 @@ export class Request {
       headers.append(k, data[k]);
     }
     return headers;
-  }
-
-  private setResponseType(responseType: 'json'|'text'|null): this {
-    this.responseType = responseType;
-    return this;
   }
 }

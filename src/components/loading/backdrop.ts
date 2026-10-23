@@ -1,6 +1,6 @@
 // @ts-ignore
 import BootstrapBackdrop from 'bootstrap/js/dist/util/backdrop'
-import ProxyElemento from "../elemento/proxy-elemento";
+import { ProxyElemento } from "../elemento/proxy-elemento";
 
 export type BootstrapBackdropType = {
   _getElement: () => HTMLElement,
@@ -8,7 +8,7 @@ export type BootstrapBackdropType = {
   hide: (callback?: () => void) => void,
 };
 
-export default class Backdrop extends ProxyElemento {
+export class Backdrop extends ProxyElemento {
   show() {
     this.classList.remove('d-none');
   }

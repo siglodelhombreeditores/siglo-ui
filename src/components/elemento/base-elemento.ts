@@ -1,4 +1,4 @@
-export default abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
+export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
   protected readonly _selector: string | null = null;
   protected _element: E | null = null;
   private _classList: ElementoClassList | null = null;

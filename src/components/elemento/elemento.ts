@@ -1,7 +1,7 @@
-import BaseElemento from './base-elemento';
+import { BaseElemento } from './base-elemento';
 import { EventListeners } from '../../services/event-listeners';
 
-export default class Elemento<E extends HTMLElement = HTMLElement> extends BaseElemento<E> {
+export class Elemento<E extends HTMLElement = HTMLElement> extends BaseElemento<E> {
   static instance<E extends HTMLElement, T extends Elemento<E>>(
     this: new (element: E) => T,
     selector: string | E | null,

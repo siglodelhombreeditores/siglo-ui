@@ -1,6 +1,6 @@
 import { BackdropMain } from "./backdrop";
-import Loading from "./loading";
-import Spinner, { pageLoaderSpinner } from "./spinner";
+import { Loading } from "./loading";
+import { Spinner, pageLoaderSpinner } from "./spinner";
 
 export class LoadingMain extends Loading {
   constructor(
