@@ -16,6 +16,10 @@ export class Loading {
     protected spinner: Spinner,
   ) {}
 
+  get isConnected(): boolean {
+    return this.backdrop.isConnected;
+  }
+
   show() {
     this.backdrop.show();
     this.spinner.show();

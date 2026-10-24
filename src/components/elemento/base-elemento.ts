@@ -1,7 +1,21 @@
+type ElementOf<C extends abstract new (...args: any) => BaseElemento<any>> =
+  InstanceType<C> extends BaseElemento<infer E> ? E : never;
+
 export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
   protected readonly _selector: string | null = null;
   protected _element: E | null = null;
   private _classList: ElementoClassList | null = null;
+
+  static instance<C extends new (selector: any, parent?: any) => BaseElemento<any>>(
+    this: C,
+    selector: string | ElementOf<C> | null,
+    parent?: Element | BaseElemento<any> | null,
+  ): InstanceType<C> | null {
+    if (!selector) return null;
+
+    const instance: BaseElemento<any> = new this(selector, parent ?? null);
+    return instance.resolve() ? (instance as InstanceType<C>) : null;
+  }
 
   constructor(
     selector: string | E | null = null,
@@ -12,6 +26,11 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
     } else {
       this._element = selector;
     }
+  }
+
+  /** Subclasses decide what "not found" means. */
+  element(): E | null {
+    return this.resolve();
   }
 
   /** Shared lookup + caching. Returns null if not found. */
@@ -29,11 +48,6 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
     }
     this._element = root ? (root.querySelector(this._selector) as E | null) : null;
     return this._element;
-  }
-
-  /** Subclasses decide what "not found" means. */
-  element(): E | null {
-    return this.resolve();
   }
 
   get classList() {

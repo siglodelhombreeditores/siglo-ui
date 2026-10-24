@@ -37,7 +37,6 @@ export class Modal extends ElementoListenable {
     // }
     this.instance()?.hide();
     this.loadingMain?.hide();
-    this.loadingContent.hide();
   }
 
   onShow(listener: () => void): this {
@@ -73,6 +72,10 @@ export class Modal extends ElementoListenable {
   }
 
   protected getLoadingContent(): Loading {
-    return Loading.instance('.loading-content', '.spinner', this);
+    const loadingContent = Loading.instance('.loading-content', '.spinner', this);
+    if (loadingContent.isConnected) {
+      this.onHidden(() => this.loadingContent.hide())
+    }
+    return loadingContent;
   }
 }

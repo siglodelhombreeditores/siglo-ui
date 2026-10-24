@@ -65,6 +65,9 @@ class Captcha {
     if (!this.enabled || (this.scriptLoaded && !this.recaptcha)) {
       callback();
     } else if (!this.scriptLoaded) {
+      if (!this.scriptLoading) {
+        throw new Error('Captcha enabled but call loadScript first');
+      }
       this.readyQueue.push(callback);
     } else if (this.recaptcha) {
       this.recaptcha.ready(callback);
@@ -76,10 +79,14 @@ class Captcha {
       if (this.version === 3) {
         this.ready(() => {
           if (this.recaptcha) {
-            this.recaptcha.execute(this.recaptchaIds[elementId], {action}).then(token => {
-              appendInput(form, 'hidden', 'g-recaptcha-response', token);
-              resolve(token);
-            }).catch(e => reject(e));
+            try {
+              this.recaptcha.execute(this.recaptchaIds[elementId], {action}).then(token => {
+                appendInput(form, 'hidden', 'g-recaptcha-response', token);
+                resolve(token);
+              });
+            } catch (e) {
+              reject(e)
+            }
           } else {
             resolve('ok');
           }
