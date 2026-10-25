@@ -1,4 +1,7 @@
+import { EventListeners } from "../event-listeners";
+
 export class Request {
+  private readonly listeners: EventListeners;
   private controller: AbortController | null = null;
   private method: string = 'GET';
   private headers: {[k: string]: string} = {
@@ -11,6 +14,7 @@ export class Request {
   private timeoutId: number|undefined = undefined;
 
   constructor() {
+    this.listeners = new EventListeners(this);
     this.headersDefault = Object.assign({}, this.headers);
   }
 
@@ -60,6 +64,16 @@ export class Request {
     this.controller?.abort()
   }
 
+  onStart(listener: () => void): this {
+    this.listeners.add("start", listener);
+    return this;
+  }
+
+  onEnd(listener: () => void): this {
+    this.listeners.add("end", listener);
+    return this;
+  }
+
   private async handleFetch<T>(
     fetchPromise: Promise<Response>,
     resolve: (resp: T) => void,
@@ -91,10 +105,12 @@ export class Request {
     } finally {
       this.controller = null;
       clearTimeout(this.timeoutId);
+      this.listeners.execute("end");
     }
   }
 
   private buildFetchInit(): RequestInit {
+    this.abort();
     this.controller = new AbortController();
     if (this.timeout) {
       this.timeoutId = window.setTimeout(() =>
@@ -110,7 +126,7 @@ export class Request {
     if (this.body) {
       requestInit.body = this.body;
     }
-
+    this.listeners.execute("start");
     return requestInit;
   }
 

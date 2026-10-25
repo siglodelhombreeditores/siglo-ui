@@ -28,30 +28,31 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
     }
   }
 
+  get classList() {
+    return this._classList ??= new ElementoClassList(this);
+  }
+
+  get dataset(): DOMStringMap {
+    return this.element()?.dataset || {}
+  }
+
   /** Subclasses decide what "not found" means. */
   element(): E | null {
     return this.resolve();
   }
 
-  /** Shared lookup + caching. Returns null if not found. */
-  protected resolve(): E | null {
-    if (this._element) return this._element;
-
-    if (!this._selector) {
-      this._element = document.body as E;
-      return this._element;
-    }
-
-    let root: ParentNode | null = document;
-    if (this.parent) {
-      root = this.parent instanceof BaseElemento ? this.parent.element() : this.parent;
-    }
-    this._element = root ? (root.querySelector(this._selector) as E | null) : null;
-    return this._element;
+  data(key: string, defaultValue: string = ''): string {
+    return this.dataset[key] ?? defaultValue;
   }
 
-  get classList() {
-    return this._classList ??= new ElementoClassList(this);
+  hide(): this {
+    this.classList.add('d-none');
+    return this;
+  }
+
+  show(): this {
+    this.classList.remove('d-none');
+    return this;
   }
 
   addEventListener<K extends keyof HTMLElementEventMap>(
@@ -84,6 +85,23 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
   querySelectorAll(selectors: string): NodeListOf<Element> {
     // noinspection CssInvalidHtmlTagReference
     return this.element()?.querySelectorAll(selectors) ?? document.querySelectorAll('nothing-matches-this');
+  }
+
+  /** Shared lookup + caching. Returns null if not found. */
+  protected resolve(): E | null {
+    if (this._element) return this._element;
+
+    if (!this._selector) {
+      this._element = document.body as E;
+      return this._element;
+    }
+
+    let root: ParentNode | null = document;
+    if (this.parent) {
+      root = this.parent instanceof BaseElemento ? this.parent.element() : this.parent;
+    }
+    this._element = root ? (root.querySelector(this._selector) as E | null) : null;
+    return this._element;
   }
 }
 

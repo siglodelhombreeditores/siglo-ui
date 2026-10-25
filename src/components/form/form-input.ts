@@ -25,6 +25,16 @@ export class FormInput {
     this.element.value = value;
   }
 
+  setValue(value: string): this {
+    this.element.value = value;
+    return this;
+  }
+
+  setDisabled(disabled: boolean): this {
+    this.element.disabled = disabled;
+    return this;
+  }
+
   setInvalidFeedback(message: string | false) {
     const prevInvalidFeedback =
       this.parent.querySelector<HTMLElement>(".invalid-feedback");

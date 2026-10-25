@@ -1,8 +1,10 @@
 import BootstrapModal from 'bootstrap/js/dist/modal';
-import { Elemento, ElementoListenable } from "../elemento/elemento";
+import type { BaseElemento } from "../elemento/base-elemento";
+import { Elemento } from "../elemento/elemento";
 import { type BootstrapBackdropType } from "../loading/backdrop";
 import { LoadingMain } from "../loading/loading-main";
 import { Loading } from "../loading/loading";
+import { EventListeners } from '../../services/event-listeners';
 
 export type SigloBootstrapModal = BootstrapModal & {
   _scrollBar: { reset: () => void },
@@ -11,14 +13,15 @@ export type SigloBootstrapModal = BootstrapModal & {
   _isTransitioning: boolean
 };
 
-export class Modal extends ElementoListenable {
-
+export class Modal extends Elemento {
+  protected readonly listeners: EventListeners;
   protected _instance: SigloBootstrapModal|null = null;
   protected loadingMain: LoadingMain|null = null;
   private _loadingContent: Loading|null = null;
 
-  constructor(element: string|HTMLElement, parent?: HTMLElement|Elemento) {
+  constructor(element: string|HTMLElement, parent?: HTMLElement|BaseElemento) {
     super(element, parent);
+    this.listeners = new EventListeners(this);
     this.listeners.onEventAdded('show', () => this.addEventListener('show.bs.modal', () => this.listeners.execute('show')))
     this.listeners.onEventAdded('hide', () => this.addEventListener('hide.bs.modal', () => this.listeners.execute('hide')))
     this.listeners.onEventAdded('hidden', () => this.addEventListener('hidden.bs.modal', () => this.listeners.execute('hidden')))
@@ -28,15 +31,17 @@ export class Modal extends ElementoListenable {
     return this._loadingContent || (this._loadingContent = this.getLoadingContent());
   }
 
-  show() {
+  show(): this {
     this.instance().show()
+    return this;
   }
-  hide() {
+  hide(): this {
     // if (!this.isShown) {
     //   this.isShown = true
     // }
     this.instance()?.hide();
     this.loadingMain?.hide();
+    return this;
   }
 
   onShow(listener: () => void): this {

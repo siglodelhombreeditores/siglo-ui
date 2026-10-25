@@ -8,14 +8,7 @@ export type BootstrapBackdropType = {
   hide: (callback?: () => void) => void,
 };
 
-export class Backdrop extends ProxyElemento {
-  show() {
-    this.classList.remove('d-none');
-  }
-  hide() {
-    this.classList.add('d-none');
-  }
-}
+export class Backdrop extends ProxyElemento {}
 
 export class BackdropMain extends Backdrop {
   private readonly bootstrapBackdrop: BootstrapBackdropType;
@@ -26,11 +19,13 @@ export class BackdropMain extends Backdrop {
     this.bootstrapBackdrop = bootstrapBackdrop;
   }
 
-  show() {
-    this.bootstrapBackdrop.show()
+  show(): this {
+    this.bootstrapBackdrop.show();
+    return this;
   }
-  hide() {
-    this.bootstrapBackdrop.hide()
+  hide(): this {
+    this.bootstrapBackdrop.hide();
+    return this;
   }
 
   getBootstrapBackdrop(): BootstrapBackdropType {

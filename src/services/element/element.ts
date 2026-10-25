@@ -23,3 +23,12 @@ export function loadScript(src: string, async = true, type = "text/javascript") 
     }
   });
 }
+
+export function requery<T extends HTMLElement>(selector: string|T, parent?: HTMLElement): T {
+  const parentElement = parent ?? document;
+  const element = typeof selector === 'string' ? (parentElement.querySelector(selector) as T | null) : selector;
+  if (!element) {
+    throw new Error(`element ${selector} not found`);
+  }
+  return element;
+}

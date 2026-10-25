@@ -56,8 +56,28 @@ abstract class BaseForm extends BaseElemento<HTMLFormElement> {
     return null;
   }
 
-  getFormData(): FormData {
-    return new FormData(this.element() ?? undefined);
+  namedItem<I extends HTMLElement = HTMLInputElement>(name: string): I | null {
+    return this.element()?.elements.namedItem(name) as I | null;
+  }
+
+  getFormData(append?: Record<string, string|Blob>): FormData {
+    const formData = new FormData(this.element() ?? undefined);
+    if (append) {
+      for (const key in append) {
+        formData.append(key, append[key]);
+      }
+    }
+    return formData;
+  }
+
+  clearInputs(): this {
+    this.getInputs().forEach(input => input.clear());
+    return this;
+  }
+
+  setInputsInvalidFeedback(invalidFeedbacks: Record<string, string|false|null>): this {
+    this.getInputs().forEach(input => input.setInvalidFeedback(invalidFeedbacks[input.name] ?? false));
+    return this;
   }
 }
 
@@ -66,6 +86,25 @@ export class Form extends BaseForm {
   override element(): HTMLFormElement {
     const element = this.resolve();
     if (!element) throw new Error(`element ${this._selector} not found`);
+    return element;
+  }
+
+  override getNamedInput(name: string): FormInput {
+    for (const input of this.getInputs()) {
+      if (input.name === name) {
+        return input;
+      }
+    }
+    throw new Error(`Form input "${name}" not found`);
+  }
+
+  override namedItem<I extends HTMLElement = HTMLInputElement>(name: string): I;
+  override namedItem<I extends HTMLElement = HTMLInputElement>(name: string): I | null;
+  override namedItem<I extends HTMLElement = HTMLInputElement>(name: string): I {
+    const element = super.namedItem<I>(name);
+    if (!element) {
+      throw new Error(`Form element "${name}" not found`);
+    }
     return element;
   }
 }
