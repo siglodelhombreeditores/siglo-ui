@@ -4,7 +4,6 @@
   "author": "Siglo",
   "license": "ISC",
   "version": "0.6.0",
-  "type": "module",
   "sideEffects": ["*.scss", "*.css"],
   "style": "scss/_index.scss",
   "sass": "scss/_index.scss",
@@ -22,18 +21,31 @@
       "default": "./styles/_index.scss"
     },
     "./styles/*": "./styles/*.scss",
+    "./webpack-config": "./webpack/webpack-config.cjs",
     "./package.json": "./package.json"
   },
-  "files": ["src", "styles", "components", "services"],
+  "files": ["src", "styles", "components", "services", "webpack"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "peerDependencies": {
     "@types/bootstrap": ">=5.0.0",
-    "bootstrap": ">=5.0.0"
+    "assets-webpack-plugin": "^7.0.0",
+    "bootstrap": ">=5.0.0",
+    "css-loader": "^3.6.0 || ^7.0.0",
+    "esbuild-loader": "^4.0.0",
+    "mini-css-extract-plugin": "^2.0.0",
+    "postcss-loader": "^7.0.0 || ^8.0.0",
+    "sass": "^1.50.0",
+    "sass-loader": "^13.0.0 || ^16.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.10.0 || ^6.0.0"
   },
   "peerDependenciesMeta": {
-    "@types/bootstrap": { "optional": true }
+    "@types/bootstrap": { "optional": true },
+    "sass": { "optional": true },
+    "sass-loader": { "optional": true },
+    "postcss-loader": { "optional": true }
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.11"
