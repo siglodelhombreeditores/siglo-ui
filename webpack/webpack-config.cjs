@@ -190,7 +190,7 @@ class WebpackConfig {
     const rules = [];
     rules.push({
       test: /\.(js|jsx|ts|tsx)?$/,
-      exclude: /(node_modules)/,
+      exclude: /node_modules\/(?!@siglo\/ui)/,
       resolve: {
         fullySpecified: false,
         extensions: ['.js', '.ts'],
