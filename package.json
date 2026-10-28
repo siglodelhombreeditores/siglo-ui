@@ -4,10 +4,21 @@
   "author": "Siglo",
   "license": "ISC",
   "version": "0.6.0",
-  "sideEffects": ["*.scss", "*.css"],
+  "sideEffects": [
+    "*.scss",
+    "*.css"
+  ],
   "style": "scss/_index.scss",
   "sass": "scss/_index.scss",
   "exports": {
+    "./admin-services": {
+      "types": "./src/admin-services/index.ts",
+      "default": "./src/admin-services/index.ts"
+    },
+    "./admin-types": {
+      "types": "./src/admin-types/index.ts",
+      "default": "./src/admin-types/index.ts"
+    },
     "./components": {
       "types": "./src/components/index.ts",
       "default": "./src/components/index.ts"
@@ -24,7 +35,15 @@
     "./webpack-config": "./webpack/webpack-config.cjs",
     "./package.json": "./package.json"
   },
-  "files": ["src", "styles", "components", "services", "webpack"],
+  "files": [
+    "src",
+    "styles",
+    "components",
+    "services",
+    "webpack",
+    "admin-types",
+    "admin-services"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -42,12 +61,22 @@
     "webpack-cli": "^4.10.0 || ^6.0.0"
   },
   "peerDependenciesMeta": {
-    "@types/bootstrap": { "optional": true },
-    "sass": { "optional": true },
-    "sass-loader": { "optional": true },
-    "postcss-loader": { "optional": true }
+    "@types/bootstrap": {
+      "optional": true
+    },
+    "sass": {
+      "optional": true
+    },
+    "sass-loader": {
+      "optional": true
+    },
+    "postcss-loader": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@types/bootstrap": "^5.2.11"
+    "@types/bootstrap": "^5.2.11",
+    "@types/jquery": "^3.5.34",
+    "@types/typeahead.js": "^0.11.6"
   }
 }

@@ -1,5 +1,5 @@
 import { Elemento } from "../../components/elemento/elemento";
-import { Form } from "../../components";
+import { Form } from "../../components/form/form";
 import { MailalertConfirmModal } from "../../components/mailalert/mailalert-confirm-modal";
 import { Request } from "../fetch/request";
 

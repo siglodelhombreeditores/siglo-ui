@@ -32,3 +32,9 @@ export function requery<T extends HTMLElement>(selector: string|T, parent?: HTML
   }
   return element;
 }
+
+export function stringToNode(string: string) {
+  const tmpElement = document.createElement('div');
+  tmpElement.innerHTML = string;
+  return tmpElement
+}

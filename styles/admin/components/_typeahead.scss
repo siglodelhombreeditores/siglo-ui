@@ -1,0 +1,74 @@
+// basedon admin-dev/themes/new-theme/scss/pages/_product_page.scss
+.siglo-typeahead-model-collection {
+  .siglo-typeahead-list {
+    &.nostyle {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    li {
+      padding: .3125rem;
+      margin-top: .3125rem;
+      display: flex;
+      align-items: center;
+      border: 1px solid #F1F1F1;
+
+      // text
+      > .media-body {
+        .label {
+          margin-left: .3125rem;
+          margin-right: .3125rem;
+        }
+
+        // delete button
+        i.delete {
+          cursor: pointer;
+          float: right;
+          color: #6c868e;
+        }
+      }
+    }
+  }
+
+  .twitter-typeahead {
+    .tt-menu {
+      width: 100%;
+      border: 1px solid #6c868e;
+      background: #ffffff;
+      padding: 0.3125rem 0;
+      max-height: 19.5rem;
+      overflow: auto;
+    }
+
+    .tt-open, .tt-suggestion {
+      padding: 0.3125rem 0.625rem;
+      color: #7a7a7a;
+    }
+
+    .tt-suggestion {
+      cursor: pointer;
+
+      &:hover {
+        //background-color: #3ed2f0;
+        //color: #ffffff;
+        background-color: var(--cdk-primary-200);
+        color: var(--cdk-primary-800);
+      }
+    }
+  }
+
+  .invisible {
+    display: none;
+  }
+
+
+  .drag-handle {
+    width: 10px;
+    height: 16px;
+    cursor: grab;
+    background-image: radial-gradient(circle, #aaa 1.5px, transparent 1.5px);
+    background-size: 5px 5px;
+  }
+  .drag-handle:active { cursor: grabbing; }
+}

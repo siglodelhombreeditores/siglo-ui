@@ -25,7 +25,7 @@ class WebpackConfig {
     this.loaderOptionsDefault = {
       'esbuild-loader': {
         loader: 'ts',
-        target: 'es2015',
+        target: 'es2020',
       },
       'css-loader': {
         sourceMap: !this.isProduction
@@ -38,7 +38,11 @@ class WebpackConfig {
       },
     }
     this.loaderOptionsCustom = {}
+    this.outputCustom = {};
     this.miniCssExtractPlugin = this.#requireResolve("mini-css-extract-plugin");
+    this.name = null;
+    this.dependencies = [];
+    this.outputClean = true;
   }
 
   get isProduction() {
@@ -100,32 +104,69 @@ class WebpackConfig {
     return this;
   }
 
+
+  /**
+   * @param {string} name
+   * @param {string} type
+   * @returns {WebpackConfig}
+   */
+  setOutputLibrary(name, type) {
+    return this.#setOutputCustom({library: { name, type }})
+  }
+
+  /**
+   * @param {boolean} clean
+   * @returns {WebpackConfig}
+   */
+  cleanOutput(clean) {
+    this.outputClean = clean;
+    return this;
+  }
+
+  /**
+   * @param {string} name
+   * @returns {WebpackConfig}
+   */
+  setName(name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * @param {string} dependencyName
+   * @returns {WebpackConfig}
+   */
+  addDependency(dependencyName) {
+    this.dependencies.push(dependencyName);
+    return this;
+  }
+
   build() {
-    const build = {
-      entry: this.#buildEntryConfig(),
-      mode: this.mode,
-      output: {
-        path: this.outputPath,
-        filename: this.#getDestinationFilename('.js'),
-        chunkFilename: this.#getDestinationFilename('.js'),
-        pathinfo: !this.isProduction,
-        clean: {
-          keep: /entrypoints\.json/ // clean: true borra entrypoints.json
-        },
-        publicPath: `/modules/${this.module}/public/`,
-      },
-      module: {
-        rules: this.#buildRules(),
-      },
-      plugins: this.#buildPlugins(),
-      externals: this.externals,
-      devtool: this.isProduction
-        // https://webpack.js.org/configuration/devtool/#for-production
-        ? 'source-map'
-        // https://webpack.js.org/configuration/devtool/#for-development
-        : 'inline-source-map',
-    };
-    this.#buildResolves(build);
+    const build = this.name ? {name: this.name} : {};
+    build.entry = this.#buildEntryConfig();
+    build.mode = this.mode;
+    build.output = Object.assign({
+      path: this.outputPath,
+      filename: this.#getDestinationFilename('.js'),
+      chunkFilename: this.#getDestinationFilename('.js'),
+      pathinfo: !this.isProduction,
+      clean: this.outputClean ? {
+        keep: /entrypoints\.json/ // clean: true borra entrypoints.json
+      } : false,
+      publicPath: `/modules/${this.module}/public/`,
+    }, this.outputCustom);
+    build.module = {  rules: this.#buildRules() };
+    build.plugins = this.#buildPlugins();
+    build.externals = this.externals;
+    // https://webpack.js.org/configuration/devtool/#for-production #for-development
+    build.devtool = this.isProduction ? 'source-map' : 'inline-source-map';
+    if (this.dependencies.length > 0) {
+      build.dependencies = this.dependencies;
+    }
+    if (this.sharedNodeModules) {
+      build.resolve = {modules: ['node_modules', this.sharedNodeModules]};
+      build.resolveLoader = {modules: ['node_modules', this.sharedNodeModules]}
+    }
     return build;
   }
 
@@ -187,6 +228,7 @@ class WebpackConfig {
         entrypoints: true,
         prettyPrint: !this.isProduction,
         removeFullPathAutoPrefix: true,
+        update: !this.outputClean,
         processOutput: assets => {
           for (const bundle in assets) {
             for (const type in assets[bundle]) {
@@ -206,18 +248,9 @@ class WebpackConfig {
     return plugins;
   }
 
-  /**
-   * @param {Object<string, any>} build
-   */
-  #buildResolves(build) {
-    if (this.sharedNodeModules) {
-      build.resolve = {
-        modules: ['node_modules', this.sharedNodeModules],
-      }
-      build.resolveLoader = {
-        modules: ['node_modules', this.sharedNodeModules],
-      }
-    }
+  #setOutputCustom(outputCustom) {
+    this.outputCustom = Object.assign(this.outputCustom, outputCustom);
+    return this;
   }
 
   #requireResolve(name) {

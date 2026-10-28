@@ -1,6 +1,6 @@
 import { Form } from "./form";
 import { loadingMain } from "../loading/loading-main";
-import { captcha } from "../../services";
+import { captcha } from "../../services/captcha";
 
 export class CustomerForm extends Form {
   public static init(selector = '#customer-form') {

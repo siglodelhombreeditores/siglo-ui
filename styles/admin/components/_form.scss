@@ -1,0 +1,28 @@
+.form-horizontal .form-wrapper {
+  margin: unset !important;
+}
+
+/**
+ * tinymce de PrestaShop son campos traducibles el cual el estilo les aplica un borde
+ * Para los tinymce que no son traducibles y el estilo se vea igual a los demas
+ */
+.siglo-tinymce .mce-tinymce {
+  border: 1px solid #dfdfdf !important;
+}
+.siglo-tinymce.has-error .mce-tinymce {
+  border-color: #f54c3e !important;
+}
+// TODO v9 eliminar
+.she-tinymce .mce-tinymce {
+  border: 1px solid #bbcdd2 !important;
+}
+.she-tinymce.has-error .mce-tinymce {
+  border-color: #f54c3e !important;
+}
+
+/**
+ * PrestaShop form_group_row duplica helps, Siglo form_group_row mitiga creando el duplicado en blanco, ocultamos
+ */
+small.form-text + small.form-text {
+  display: none;
+}

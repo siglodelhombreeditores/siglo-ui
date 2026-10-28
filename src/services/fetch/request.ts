@@ -23,6 +23,16 @@ export class Request {
     return this;
   }
 
+  setHeaders(headers: { [k: string]: string } | null) {
+    this.headers = headers || Object.assign({}, this.headersDefault);
+    return this;
+  }
+
+  addHeader(key: string, value: string) {
+    this.headers[key] = value;
+    return this;
+  }
+
   setBody(data: { [k: string]: any }|FormData|HTMLFormElement|string|null) {
     if (data instanceof HTMLFormElement) {
       data = new FormData(data);
