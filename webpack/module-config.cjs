@@ -1,7 +1,7 @@
 const path = require("path");
 const StyleEntriesCleaner = require("./style-entries-cleaner.cjs");
 
-class WebpackConfig {
+class ModuleConfig {
   /**
    * @param {string} module
    * @param {'development'|'production'} mode
@@ -43,6 +43,7 @@ class WebpackConfig {
     this.name = null;
     this.dependencies = [];
     this.outputClean = true;
+    this.enableCheckTypescriptTypes = false;
   }
 
   get isProduction() {
@@ -52,7 +53,7 @@ class WebpackConfig {
   /**
    * @param {string} name
    * @param {string|object} src
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addEntry(name, src) {
     if (this.entries.has(name) || this.styelEntries.has(name)) {
@@ -65,7 +66,7 @@ class WebpackConfig {
   /**
    * @param {string} name
    * @param {string} src
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addStyleEntry(name, src) {
     if (this.styelEntries.has(name) || this.entries.has(name)) {
@@ -77,7 +78,7 @@ class WebpackConfig {
 
   /**
    * @param {object} externals
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addExternals(externals = {}) {
     Object.assign(this.externals, externals);
@@ -85,7 +86,7 @@ class WebpackConfig {
   }
 
   /**
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addExternalJQuery() {
     return this.addExternals({
@@ -93,11 +94,17 @@ class WebpackConfig {
       jquery: 'jQuery'
     })
   }
+  /**
+   * @returns {ModuleConfig}
+   */
+  addExternalSigloAdmin() {
+    return this.addExternals({'@siglo/ui/admin-services': 'sigloAdmin'});
+  }
 
   /**
    * @param {string} loaderName
    * @param {object} options
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addLoaderOptions(loaderName, options) {
     this.loaderOptionsCustom[loaderName] = options;
@@ -108,7 +115,7 @@ class WebpackConfig {
   /**
    * @param {string} name
    * @param {string} type
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   setOutputLibrary(name, type) {
     return this.#setOutputCustom({library: { name, type }})
@@ -116,7 +123,7 @@ class WebpackConfig {
 
   /**
    * @param {boolean} clean
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   cleanOutput(clean) {
     this.outputClean = clean;
@@ -125,7 +132,7 @@ class WebpackConfig {
 
   /**
    * @param {string} name
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   setName(name) {
     this.name = name;
@@ -134,10 +141,22 @@ class WebpackConfig {
 
   /**
    * @param {string} dependencyName
-   * @returns {WebpackConfig}
+   * @returns {ModuleConfig}
    */
   addDependency(dependencyName) {
     this.dependencies.push(dependencyName);
+    return this;
+  }
+
+  /**
+   * @param {boolean|object|string} options
+   * @returns {ModuleConfig}
+   */
+  checkTypescriptTypes(options = true) {
+    if (typeof options === 'string' && options) {
+      options = {typescript: {configFile: options}};
+    }
+    this.enableCheckTypescriptTypes = options;
     return this;
   }
 
@@ -239,11 +258,22 @@ class WebpackConfig {
           }
           return JSON.stringify(assets, null, 2);
         }
-      })
+      }),
     ];
     const styleEntries = [...this.styelEntries.keys()];
     if (styleEntries.length) {
       plugins.push(new StyleEntriesCleaner(styleEntries))
+    }
+    if (this.enableCheckTypescriptTypes) {
+      const ForkTsCheckerWebpackPlugin = this.#requireResolve("fork-ts-checker-webpack-plugin");
+      let options = typeof this.enableCheckTypescriptTypes === 'object' ? this.enableCheckTypescriptTypes : {};
+      if (this.sharedNodeModules) {
+        options = this.#deepMerge({typescript: {configOverwrite: {compilerOptions: {
+          paths: {"*": [this.sharedNodeModules + "/@types/*", this.sharedNodeModules + "/*"]},
+          typeRoots: [this.sharedNodeModules + "/@types"]
+        }}}}, options);
+      }
+      plugins.push(new ForkTsCheckerWebpackPlugin(options));
     }
     return plugins;
   }
@@ -256,6 +286,25 @@ class WebpackConfig {
   #requireResolve(name) {
     return require(require.resolve(name, { paths: this.roots }));
   }
+
+  #deepMerge(target, source) {
+    const result = { ...target };
+    for (const key in source) {
+      if (
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key]) &&
+        key in target &&
+        typeof target[key] === "object" &&
+        !Array.isArray(target[key])
+      ) {
+        result[key] = this.#deepMerge(target[key], source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    }
+
+    return result;
+  }
 }
 
-module.exports = WebpackConfig;
+module.exports = ModuleConfig;
