@@ -3,7 +3,7 @@
   "description": "Funcionalidades PrestaShop themes Siglo",
   "author": "Siglo",
   "license": "ISC",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "sideEffects": [
     "*.scss",
     "*.css"
