@@ -33,9 +33,12 @@
     },
     "./styles/*": "./styles/*.scss",
     "./webpack-module-config": "./webpack/module-config.cjs",
+    "./webpack-theme-config": "./webpack/theme-config.cjs",
+    "./webpack-she-upgrade-peer-require": "./webpack/util/she-upgrade/peer-require.cjs",
     "./package.json": "./package.json"
   },
   "files": [
+    "bin",
     "src",
     "styles",
     "components",
@@ -46,6 +49,9 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "siglo-webpack-theme": "bin/webpack-theme.cjs"
   },
   "peerDependencies": {
     "@types/bootstrap": ">=5.0.0",
