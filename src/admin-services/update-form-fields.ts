@@ -1,5 +1,6 @@
 import { loader } from "./loader";
 import { stringToNode } from "../services/element/element";
+import { imageUpload } from "./image-upload/image-upload";
 
 export function updateFormFields() {
   const updateFieldsTriggers = document.querySelectorAll<HTMLSelectElement>('[data-update-form-fields-trigger]');
@@ -54,9 +55,7 @@ function updateFormGroups(container: HTMLElement, currentFormGroups: FormGroup[]
     }
   }
 
-  if (window.enhancedfields) {
-    window.enhancedfields.fileUpload.initFields();
-  }
+  imageUpload.init();
 }
 
 function insertFormGroup(container: HTMLElement, newFormGroup: FormGroup, newFormGroups: FormGroup[], currentFormGroups: FormGroup[]) {

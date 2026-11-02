@@ -55,11 +55,13 @@
   },
   "peerDependencies": {
     "@types/bootstrap": ">=5.0.0",
+    "@types/dropzone": "^5.7.9",
     "@types/jquery": "^3.5.34",
     "@types/typeahead.js": "^0.11.6",
     "assets-webpack-plugin": "^7.0.0",
     "bootstrap": ">=5.0.0",
     "css-loader": "^3.6.0 || ^7.0.0",
+    "dropzone": "^5.9.3",
     "esbuild-loader": "^4.0.0",
     "fork-ts-checker-webpack-plugin": "^8.0.0 || ^9.1.0",
     "mini-css-extract-plugin": "^2.0.0",
@@ -71,6 +73,12 @@
   },
   "peerDependenciesMeta": {
     "@types/bootstrap": {
+      "optional": true
+    },
+    "@types/dropzone": {
+      "optional": true
+    },
+    "dropzone": {
       "optional": true
     },
     "sass": {
@@ -85,6 +93,7 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.11",
+    "@types/dropzone": "^5.7.9",
     "@types/jquery": "^3.5.34",
     "@types/typeahead.js": "^0.11.6"
   }

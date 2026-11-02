@@ -12,12 +12,6 @@ declare class ModalConfirmation {
 
 declare global {
   interface Window {
-    enhancedfields?: {
-      fileUpload: {
-        import(): Promise<typeof FileUpload>;
-        initFields(): void;
-      }
-    };
     prestashop: PrestaShop;
     modalConfirmation: ModalConfirmation;
     str2url(str: string): string;

@@ -63,6 +63,11 @@ class Form {
   enableSubmitButton() {
     this.setSubmitButtonDisabled(false)
   }
+  setSubmitButtonDisabled(disable: boolean) {
+    if (this.getSubmitButton()) {
+      this.getSubmitButton()!.disabled = disable;
+    }
+  }
 
   private onSubmit = (event: SubmitEvent): void => {
     if (!this.blocked) return;
@@ -74,12 +79,6 @@ class Form {
     this.pendingSubmit = true;
     this.pendingSubmitter = event.submitter;
   };
-
-  private setSubmitButtonDisabled(disable: boolean) {
-    if (this.getSubmitButton()) {
-      this.getSubmitButton()!.disabled = disable;
-    }
-  }
 }
 
 type FormControl =
