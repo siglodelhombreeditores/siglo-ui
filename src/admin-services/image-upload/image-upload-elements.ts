@@ -1,4 +1,5 @@
 import { getForm } from "../form";
+import { elementCreate } from "../../services/element/element-create";
 
 export class ImageUploadElements {
 
@@ -15,6 +16,8 @@ export class ImageUploadElements {
   private dataDeletable: boolean;
   private deleteListener: (() => void)|null = null;
   private deleteListenerAttached = false;
+  private imgPrevSrc: string;
+  private imgContainerHeight: number = 0;
 
   constructor(
     public readonly element: HTMLElement,
@@ -30,10 +33,15 @@ export class ImageUploadElements {
 
     this.deletableLabel = this.dataset('deletableLabel', 'Delete');
     this.dataDeletable = !!this.dataset('deletable');
+    this.imgPrevSrc = this.img?.src ?? '';
   }
 
   get deletable(): boolean {
     return this.dataDeletable;
+  }
+
+  get clientWidth(): number {
+    return this.element.clientWidth;
   }
 
   dataset(key: string, defaultValue: string = ''): string {
@@ -51,14 +59,28 @@ export class ImageUploadElements {
     if (!this.img) {
       this.createFileViewer();
     }
+    if (src) {
+      this.imgPrevSrc = src;
+    }
     this.img!.src = src;
-    this.imgContainer!.classList.remove('empty')
+    this.imgContainer!.classList.toggle('empty', !src)
   }
 
-  loading(show: boolean) {
+  setImgPrevSrc(): this {
+    if (this.img && this.imgPrevSrc) {
+      this.setImgSrc(this.imgPrevSrc);
+    }
+    return this;
+  }
+
+  loading(show: boolean, imgContainerDimensions: {width?: number, height: number} = {height: 0}): void {
     if (show) {
       this.prependLoadingOverlay();
+      if (imgContainerDimensions.height) {
+        this.setImgSrc('');
+      }
     }
+    this.setImgContainerDimensions(imgContainerDimensions);
     // in loading show false maybe figure doesnt exist, thats why no getFigure() is used
     this.figure?.classList.toggle('loading', show);
     getForm(this.input)?.setSubmitButtonDisabled(show);
@@ -106,6 +128,8 @@ export class ImageUploadElements {
       this.img = null;
       this.loadingOverlay = null;
       this.figcaption = null;
+      this.imgContainerHeight = 0;
+      this.imgPrevSrc = '';
     })
   }
 
@@ -141,18 +165,14 @@ export class ImageUploadElements {
     }
   }
 
-  private createFileViewer(): HTMLElement {
-    this.fileViewer = document.createElement('div');
-    this.fileViewer.classList.add('file-viewer', 'mt-3');
+  private createFileViewer(imgContainerHeight: number = 0): HTMLElement {
+    if (!this.imgContainerHeight) {
 
-    this.figure = document.createElement('figure');
-    this.figure.classList.add('figure');
-
-    this.imgContainer = document.createElement('div');
-    this.imgContainer.classList.add('figure-img-container', 'empty')
-
-    this.img = document.createElement('img');
-    this.img.classList.add('figure-img', 'img-fluid', 'img-thumbnail');
+    }
+    this.fileViewer = elementCreate('div.file-viewer.mt-3');
+    this.figure = elementCreate('figure.figure');
+    this.imgContainer = elementCreate('div.figure-img-container.empty');
+    this.img = elementCreate('img.figure-img.img-fluid.img-thumbnail');
 
     this.imgContainer.appendChild(this.img);
     this.figure.appendChild(this.imgContainer);
@@ -171,8 +191,7 @@ export class ImageUploadElements {
 
   private prependLoadingOverlay() {
     if (!this.loadingOverlay) {
-      this.loadingOverlay = document.createElement('div');
-      this.loadingOverlay.classList.add('loader-overlay');
+      this.loadingOverlay = elementCreate('div.loader-overlay')
       this.loadingOverlay.appendChild(document.createElement('div'))
       this.getImgContainer().prepend(this.loadingOverlay);
     }
@@ -180,8 +199,7 @@ export class ImageUploadElements {
 
   private getFigcaption(): HTMLElement {
     if (!this.figcaption) {
-      this.figcaption = document.createElement('figcaption');
-      this.figcaption.classList.add('figure-caption');
+      this.figcaption = elementCreate('figcaption.figure-caption');
       this.getFigure().appendChild(this.figcaption);
     }
     return this.figcaption;
@@ -189,13 +207,9 @@ export class ImageUploadElements {
 
   private getDeleteButton(): HTMLButtonElement {
     if (!this.deleteButton) {
-      this.deleteButton = document.createElement('button');
-      this.deleteButton.classList.add('btn', 'btn-outline-danger', 'btn-sm');
-      this.deleteButton.setAttribute('type', 'button')
+      this.deleteButton = elementCreate('button.btn.btn-outline-danger.btn-sm[type="button"]');
 
-      const icon = document.createElement('i');
-      icon.classList.add('material-icons')
-      icon.innerText = 'delete_forever'
+      const icon = elementCreate('i.material-icons:contains("delete_forever")');
 
       this.deleteButton.append(icon, ` ${this.deletableLabel}`)
       this.getFigcaption().appendChild(this.deleteButton);
@@ -236,5 +250,20 @@ export class ImageUploadElements {
         resolve();
       }
     })
+  }
+
+  private setImgContainerHeight(height: number = 0) {
+    if (this.imgContainerHeight !== height) {
+      this.imgContainerHeight = height;
+      this.getImgContainer().style.height = height ? height + 'px' : '';
+    }
+  }
+
+  private setImgContainerDimensions(dimensions: {width?: number, height: number} = {height: 0}) {
+    if (this.imgContainerHeight !== dimensions.height) {
+      this.imgContainerHeight = dimensions.height;
+      this.getImgContainer().style.height = dimensions.height ? dimensions.height + 'px' : '';
+      this.getImgContainer().style.width = dimensions.width ? dimensions.width + 'px' : '';
+    }
   }
 }

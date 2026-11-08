@@ -1,5 +1,5 @@
 import { ImageUploadElements } from "./image-upload-elements";
-import Dropzone from 'dropzone';
+import Dropzone, { type DropzoneFile } from 'dropzone';
 import '../../../styles/admin/components/_image-upload.scss';
 
 Dropzone.autoDiscover = false;
@@ -12,6 +12,8 @@ export class ImageUploadDropzone {
   private readonly filenameOriginal: string;
   private readonly fileSizeLabel: string;
   private readonly placeholder: string;
+  private readonly dropzone: Dropzone;
+  private previousImageHash: string = '';
 
   static instance(element: HTMLElement): ImageUploadDropzone|null {
     const inputElement = element.querySelector<HTMLInputElement>('input.custom-file-input');
@@ -36,21 +38,48 @@ export class ImageUploadDropzone {
     this.fileSizeLabel = this.elements.dataset('fileSizeLabel','File size');
     this.placeholder = this.elements.dataset('placeholder', 'Choose file(s)');
 
-    const dropzone = new Dropzone(this.elements.input, {
+    this.dropzone = new Dropzone(this.elements.input, {
       url: this.uploadUrl,
       paramName: 'file_upload',
-      sending: () => this.elements.loading(true),
-      error: (file: any, response: any) => this.onDropzoneError(response),
+      accept: async (file, done) => {
+        const hash = await this.getFileHash(file);
+        if (hash && hash === this.previousImageHash) {
+          done('Image already uploaded');
+        } else {
+          this.previousImageHash = hash;
+          done();
+        }
+      },
+      error: (file: any, response: any) => this.onError(response),
+      sending: file => this.showLoading(file),
     });
-    dropzone.on('success', (file, response) => this.onDropzoneSuccess(response))
+    this.dropzone.on('success', (file, response) => this.onSuccess(response))
 
     if (this.elements.deletable) {
       this.elements.onDelete(() => this.deleteHandler())
     }
   }
 
-  private onDropzoneError(response: string|any) {
-    this.elements.loading(false);
+  /**
+   * Que el loading tenga el tamaño de la imagen que se va a cargar
+   */
+  private async showLoading(file: DropzoneFile) {
+    try {
+      const dimensions = await this.getImageDimensions(file);
+      const widgetWidth = this.elements.clientWidth;
+      this.elements.loading(true, dimensions.width > widgetWidth
+        ? {height: widgetWidth * (dimensions.height / dimensions.width)}
+        : dimensions);
+    } catch (e) {
+      this.elements.loading(true)
+    }
+  }
+
+  private onError(response: string|any) {
+    if (response === 'Image already uploaded') {
+      return;
+    }
+    this.elements.setImgPrevSrc().loading(false);
     this.addErrorMessage(
       typeof response === 'string' ? response : (response.error || response.message || response.detail || response.title || 'Unknown error')
     );
@@ -59,7 +88,7 @@ export class ImageUploadDropzone {
     }
   }
 
-  private async onDropzoneSuccess(response: any) {
+  private async onSuccess(response: any) {
     this.elements.label.innerText = response.name
     this.elements.input.value = response.path
     await this.showImage(response.path);
@@ -98,5 +127,37 @@ export class ImageUploadDropzone {
     this.elements.label.innerText = this.placeholder
     this.elements.input.value = ''
     this.elements.removeFileViewer();
+  }
+
+  private getImageDimensions(file: File): Promise<{ width: number; height: number;}> {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const url = URL.createObjectURL(file);
+
+      image.onload = () => {
+        resolve({width: image.naturalWidth, height: image.naturalHeight});
+        URL.revokeObjectURL(url);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Unable to load image'));
+      };
+
+      image.src = url;
+    });
+  }
+
+  private async getFileHash(file: File): Promise<string> {
+    try {
+      const buffer = await file.arrayBuffer();
+      const hash = await crypto.subtle.digest('SHA-256', buffer);
+
+      return Array.from(new Uint8Array(hash))
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
+    } catch (e) {
+      return ''
+    }
   }
 }

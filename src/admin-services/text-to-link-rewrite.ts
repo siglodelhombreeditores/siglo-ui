@@ -19,7 +19,6 @@ export const textToLinkRewrite = ({
 }: TextToLinkRewriteParams): void => {
   const source = getInputBySelector(sourceSelector);
   if (!source) {
-    console.warn('textToLinkRewrite: source not found');
     return;
   }
   document.addEventListener(eventName, (event: Event) => {

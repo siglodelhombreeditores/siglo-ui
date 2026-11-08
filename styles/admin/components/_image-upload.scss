@@ -1,7 +1,4 @@
 .siglo-image-upload {
-  .dummy-input {
-    cursor: default;
-  }
   .custom-file-label:after {
     content: attr(data-after-content) !important;
   }
@@ -55,6 +52,18 @@
 
   figcaption {
     margin-top: .9375rem;
+  }
+}
+
+// image upload no translation, label column ocupa height completo, cuando imagen el espacio en blanco click llama cargar archivo
+.siglo_image_upload-widget {
+  .form-control-label {
+    height: fit-content;
+    cursor: pointer;
+  }
+  // SheUpgrade: prestashop v8 no tiene
+  .custom-file-input {
+    cursor: pointer;
   }
 }
 
