@@ -4,7 +4,7 @@ import { Elemento } from "../elemento/elemento";
 import { type BootstrapBackdropType } from "../loading/backdrop";
 import { LoadingMain } from "../loading/loading-main";
 import { Loading } from "../loading/loading";
-import { EventListeners } from '../../services/event-listeners';
+import { EventDispatcher } from '../../services/event/event-dispatcher';
 
 export type SigloBootstrapModal = BootstrapModal & {
   _scrollBar: { reset: () => void },
@@ -14,17 +14,20 @@ export type SigloBootstrapModal = BootstrapModal & {
 };
 
 export class Modal extends Elemento {
-  protected readonly listeners: EventListeners;
+  protected readonly dispatcher: EventDispatcher;
   protected _instance: SigloBootstrapModal|null = null;
   protected loadingMain: LoadingMain|null = null;
   private _loadingContent: Loading|null = null;
 
   constructor(element: string|HTMLElement, parent?: HTMLElement|BaseElemento) {
     super(element, parent);
-    this.listeners = new EventListeners(this);
-    this.listeners.onEventAdded('show', () => this.addEventListener('show.bs.modal', () => this.listeners.execute('show')))
-    this.listeners.onEventAdded('hide', () => this.addEventListener('hide.bs.modal', () => this.listeners.execute('hide')))
-    this.listeners.onEventAdded('hidden', () => this.addEventListener('hidden.bs.modal', () => this.listeners.execute('hidden')))
+    this.dispatcher = new EventDispatcher(this);
+    this.dispatcher.onEventAdded('show', () =>
+      this.addEventListener('show.bs.modal', () => this.dispatcher.dispatch('show')))
+    this.dispatcher.onEventAdded('hide', () =>
+      this.addEventListener('hide.bs.modal', () => this.dispatcher.dispatch('hide')))
+    this.dispatcher.onEventAdded('hidden', () =>
+      this.addEventListener('hidden.bs.modal', () => this.dispatcher.dispatch('hidden')))
   }
 
   get loadingContent(): Loading {
@@ -45,17 +48,17 @@ export class Modal extends Elemento {
   }
 
   onShow(listener: () => void): this {
-    this.listeners.add('show', listener);
+    this.dispatcher.add('show', listener);
     return this;
   }
 
   onHide(callback: (this: this, e: Event) => void): this {
-    this.listeners.add('hide', callback)
+    this.dispatcher.add('hide', callback)
     return this
   }
 
   onHidden(listener: () => void): this {
-    this.listeners.add('hidden', listener);
+    this.dispatcher.add('hidden', listener);
     return this;
   }
 

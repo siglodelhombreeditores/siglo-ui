@@ -24,6 +24,13 @@ export function loadScript(src: string, async = true, type = "text/javascript") 
   });
 }
 
+export function replaceSelectorWith(selector: string, contents: string) {
+  const element = document.querySelector<HTMLElement>(selector)
+  if (element) {
+    element.outerHTML = contents;
+  }
+}
+
 export function requery<T extends HTMLElement>(selector: string|T, parent?: HTMLElement): T {
   const parentElement = parent ?? document;
   const element = typeof selector === 'string' ? (parentElement.querySelector(selector) as T | null) : selector;
@@ -37,4 +44,8 @@ export function stringToNode(string: string) {
   const tmpElement = document.createElement('div');
   tmpElement.innerHTML = string;
   return tmpElement
+}
+
+export function targetClosest<T extends HTMLElement>(target: EventTarget|null, selector: string): T|null {
+  return target instanceof Element ? target.closest<T>(selector) : null;
 }

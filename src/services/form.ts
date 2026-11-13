@@ -12,3 +12,10 @@ export function checkValidity(formElement: HTMLFormElement) {
   formElement.classList.add('was-validated');
   return valid;
 }
+
+export function getSelectOptions(select: HTMLSelectElement): {value: string, label: string}[] {
+  return Array.from(select.options, option => ({
+    value: option.value,
+    label: option.textContent ? option.textContent.trim() : ''
+  }));
+}

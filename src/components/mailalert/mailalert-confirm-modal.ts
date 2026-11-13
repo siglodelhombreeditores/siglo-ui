@@ -10,8 +10,8 @@ export class MailalertConfirmModal extends Modal {
   constructor(element: string|HTMLElement, parent?: HTMLElement|BaseElemento) {
     super(element, parent);
     this.confirmSubmitButton = this.querySelector('.js-siglo-mailalert-confirm-submit') as HTMLButtonElement;
-    this.listeners.onEventAdded('confirmSubmit', () =>
-      this.confirmSubmitButton.addEventListener('click', () => this.listeners.execute('confirmSubmit'))
+    this.dispatcher.onEventAdded('confirmSubmit', () =>
+      this.confirmSubmitButton.addEventListener('click', () => this.dispatcher.dispatch('confirmSubmit'))
     );
     this.modalBody = this.querySelector('.modal-body') as HTMLElement;
     this.modalSubtitle = this.querySelector('.modal-subtitle') as HTMLElement;
@@ -22,7 +22,7 @@ export class MailalertConfirmModal extends Modal {
   }
 
   onConfirmSubmit(listener: () => void) {
-    this.listeners.add('confirmSubmit', listener);
+    this.dispatcher.add('confirmSubmit', listener);
   }
 
   clear() {

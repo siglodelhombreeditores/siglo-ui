@@ -1,7 +1,7 @@
-import { EventListeners } from "../event-listeners";
+import { EventDispatcher } from "../event/event-dispatcher";
 
 export class Request {
-  private readonly listeners: EventListeners;
+  private readonly dispatcher: EventDispatcher;
   private controller: AbortController | null = null;
   private method: string = 'GET';
   private headers: {[k: string]: string} = {
@@ -14,7 +14,7 @@ export class Request {
   private timeoutId: number|undefined = undefined;
 
   constructor() {
-    this.listeners = new EventListeners(this);
+    this.dispatcher = new EventDispatcher(this);
     this.headersDefault = Object.assign({}, this.headers);
   }
 
@@ -75,12 +75,12 @@ export class Request {
   }
 
   onStart(listener: () => void): this {
-    this.listeners.add("start", listener);
+    this.dispatcher.add("start", listener);
     return this;
   }
 
   onEnd(listener: () => void): this {
-    this.listeners.add("end", listener);
+    this.dispatcher.add("end", listener);
     return this;
   }
 
@@ -115,7 +115,7 @@ export class Request {
     } finally {
       this.controller = null;
       clearTimeout(this.timeoutId);
-      this.listeners.execute("end");
+      this.dispatcher.dispatch("end");
     }
   }
 
@@ -136,7 +136,7 @@ export class Request {
     if (this.body) {
       requestInit.body = this.body;
     }
-    this.listeners.execute("start");
+    this.dispatcher.dispatch("start");
     return requestInit;
   }
 

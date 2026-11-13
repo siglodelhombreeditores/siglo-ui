@@ -32,7 +32,7 @@ function runtimeParse(argv, cwd) {
     pwd,
     environment,
     environment !== 'prod',
-    envConfig.parsed.PS_ADMIN_DIR ?? 'admin-dev'
+    envConfig.parsed.PS_ADMIN_DIR ?? envConfig.parsed.PS_BO_DIR ?? 'admin-dev'
   );
 }
 

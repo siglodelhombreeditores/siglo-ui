@@ -1,20 +1,17 @@
-type ElementOf<C extends abstract new (...args: any) => BaseElemento<any>> =
-  InstanceType<C> extends BaseElemento<infer E> ? E : never;
+type ElementOf<T> = T extends BaseElemento<infer E> ? E : never;
 
 export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
   protected readonly _selector: string | null = null;
   protected _element: E | null = null;
   private _classList: ElementoClassList | null = null;
 
-  static instance<C extends new (selector: any, parent?: any) => BaseElemento<any>>(
-    this: C,
-    selector: string | ElementOf<C> | null,
-    parent?: Element | BaseElemento<any> | null,
-  ): InstanceType<C> | null {
-    if (!selector) return null;
-
-    const instance: BaseElemento<any> = new this(selector, parent ?? null);
-    return instance.resolve() ? (instance as InstanceType<C>) : null;
+  static instance<T extends BaseElemento<any>>(
+    this: new (elemento: any) => T,
+    selector: string | ElementOf<T> | null,
+    parent: Element | BaseElemento<any> | ParentNode = document,
+  ): T | null {
+    const element= typeof selector === 'string' ? parent.querySelector(selector) : selector;
+    return element ? new this(element) : null;
   }
 
   constructor(
@@ -28,12 +25,36 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
     }
   }
 
-  get classList() {
+  get classList(): ElementoClassList {
     return this._classList ??= new ElementoClassList(this);
   }
 
   get dataset(): DOMStringMap {
     return this.element()?.dataset || {}
+  }
+
+  get isConnected(): boolean {
+    return !!(this.element()?.isConnected);
+  }
+
+  get selector(): string|null {
+    return this._selector;
+  }
+
+  appendChild(child: HTMLElement | BaseElemento): void {
+    const element = this.element();
+    if (element) {
+      const childElement = child instanceof BaseElemento ? child.element() : child;
+      if (childElement) {
+        element.appendChild(childElement);
+      }
+    }
+  }
+
+  contains(child: Node | BaseElemento): boolean {
+    const element = this.element();
+    const childElement = element && child instanceof BaseElemento ? child.element() : child;
+    return element && childElement ? element.contains(childElement as Node) : false;
   }
 
   /** Subclasses decide what "not found" means. */
@@ -70,6 +91,7 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
     listener: EventListenerOrEventListenerObject,
     options?: boolean | AddEventListenerOptions
   ): void {
+    this.onAddEventListener(type, listener, options);
     this.element()?.addEventListener(type, listener, options);
   }
 
@@ -96,13 +118,15 @@ export abstract class BaseElemento<E extends HTMLElement = HTMLElement> {
       return this._element;
     }
 
-    let root: ParentNode | null = document;
-    if (this.parent) {
-      root = this.parent instanceof BaseElemento ? this.parent.element() : this.parent;
-    }
-    this._element = root ? (root.querySelector(this._selector) as E | null) : null;
+    this._element = (this.parent || document).querySelector(this._selector) as E | null;
     return this._element;
   }
+
+  protected onAddEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ): void {}
 }
 
 export class ElementoClassList {
@@ -118,5 +142,9 @@ export class ElementoClassList {
   }
   contains(token: string): boolean {
     return this.owner.element()?.classList.contains(token) ?? false;
+  }
+  toggle(token: string, force: boolean) {
+    this.owner.element()?.classList.toggle(token, force);
+    return this;
   }
 }

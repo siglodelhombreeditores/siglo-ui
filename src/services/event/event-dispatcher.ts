@@ -1,4 +1,4 @@
-export class EventListeners<T = (...args: any[]) => any> {
+export class EventDispatcher<T = (...args: any[]) => any> {
   private readonly events: {[eventName: string]: Array<T>}
   private readonly owner: any;
   private eventAddedListeners: {[eventName: string]: Array<() => void>} = {}
@@ -16,6 +16,10 @@ export class EventListeners<T = (...args: any[]) => any> {
     return this.events[eventName];
   }
 
+  getEventNamesRegistered(): string[] {
+    return Object.keys(this.events);
+  }
+
   has(eventName: string): boolean {
     return typeof this.events[eventName] !== 'undefined'
   }
@@ -27,7 +31,7 @@ export class EventListeners<T = (...args: any[]) => any> {
     return this
   }
 
-  execute(eventName: string, ...args: any[]) {
+  dispatch(eventName: string, ...args: any[]) {
     this.get(eventName).forEach(listener => (listener as (...args: any[]) => any).apply(this.owner, args))
   }
 

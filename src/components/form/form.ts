@@ -1,22 +1,11 @@
 import { BaseElemento } from "../elemento/base-elemento";
 import { FormInput } from "./form-input";
-import { EventListeners } from "../../services/event-listeners";
 
 abstract class BaseForm extends BaseElemento<HTMLFormElement> {
 
   public static InputClass: typeof FormInput = FormInput;
 
-  protected readonly listeners: EventListeners;
-
   protected inputs: FormInput[]|null = null;
-
-  constructor(selector: string | HTMLFormElement | null = null, parent: Element | BaseElemento | null = null) {
-    super(selector, parent);
-    this.listeners = new EventListeners(this);
-    this.listeners.onEventAdded('submit', () =>
-      this.addEventListener('submit', e => this.listeners.execute('submit', e))
-    )
-  }
 
   checkValidity() {
     const valid = this.element()?.checkValidity() ?? false;
@@ -25,7 +14,7 @@ abstract class BaseForm extends BaseElemento<HTMLFormElement> {
   }
 
   onSubmit(listener: (e: SubmitEvent) => void) {
-    this.listeners.add('submit', listener);
+    this.addEventListener('submit', listener);
   }
 
   submit() {
